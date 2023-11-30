@@ -16,11 +16,11 @@
                 /* background-image: linear-gradient(to right,rgb(132, 215, 84),rgb(165, 219, 133),rgb(165, 219, 133),white); */
                 /* background-color: rgb(165, 219, 133); */
                 background-color: white;
-                width: 30vw;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 box-shadow: gray 2px 4px 5px;
+                padding: 65px;
             }
             .register-container{    
                 display: flex;

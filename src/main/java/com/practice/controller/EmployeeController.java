@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.None;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.practice.util.RestUtil;
 
@@ -59,17 +60,6 @@ public class EmployeeController {
                 int employee_id = data.getInt("employee_id");
                 session.setAttribute("employee_id",employee_id);
             }
-            
-            // JSONObject empid = (JSONObject) empdata.get("employee_id");
-            //System.out.println(jsonObject);
-            // JSONParser par=new JSONParser(details);
-            // JSONObject json=(JSONObject)par.parse();
-           // System.out.println(jsonObject.getString("data").substring("employee_id"));
-
-           
-            // if ("success".equals(jsonObject.get("status"))) {
-            //     session.setAttribute("employee_id", employee_id);                
-            // }
             return details;
         }
         catch(Exception ex){
@@ -105,7 +95,7 @@ public class EmployeeController {
     public ModelAndView home_page(HttpSession session,@PathVariable("employee_id") Integer employee_id){
         Integer userId=(Integer) session.getAttribute("employee_id");
         if(userId!=null && userId == employee_id){
-            return new ModelAndView("/home/{employee_id}");
+            return new ModelAndView("/home");
         }
         return new ModelAndView("redirect:/login");
     }
@@ -113,16 +103,59 @@ public class EmployeeController {
     
     public static String employeeDetails=null;
 
-    @GetMapping(value = "/getEmployee/Details/{employee_id}")
-    public static String getEmployeeDetails(@PathVariable ("employee_id") String employee_id){
-        try{
-            RestUtil restUtil = new RestUtil();
-            Map<String,Object>params=new HashMap<String,Object>();
-            employeeDetails=restUtil.get("http://localhost:5001/getEmployee/"+employee_id, params);
-            return employeeDetails.toString();
-            
-        }catch(Exception ex){
+    @GetMapping(value = "/getEmployee/Details")
+    public static String getEmployeeDetails(HttpSession session){
+        Integer userId=(Integer) session.getAttribute("employee_id");
+        JSONObject jsonObject=new JSONObject();
+        if(userId!=null){
+            try{
+                
+                RestUtil restUtil = new RestUtil();
+                Map<String,Object>params=new HashMap<String,Object>();
+                employeeDetails=restUtil.get("http://localhost:5001/getEmployee/"+userId, params);
+                return employeeDetails.toString();
+                
+            }catch(Exception ex){
             LOGGER.error("details",ex);
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", JSONObject.NULL);
+            jsonObject.put("data", "yes");
+            return jsonObject.toString();
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    public static String getEmployeeDetails(){
+        return employeeDetails;
+    }
+
+    @GetMapping(value = "/reset/password")
+    public ModelAndView showResetPswdPage(){
+        return new ModelAndView("forgotPswd");
+    }
+
+
+    @GetMapping(value = "/showDetailsPage")
+    public ModelAndView showDetailPage(HttpSession session){
+        Integer userId=(Integer) session.getAttribute("employee_id");
+        if (userId!=null){
+            return new ModelAndView("details");
+        }
+        return new ModelAndView("redirect:/login");
+    }
+
+    @PostMapping(value = "/change/password")
+    public String updatePswd(HttpSession session,String employee_name,String email,String password){
+        try {
+            Map<String,Object> params= new HashMap<String,Object>();
+            params.put("employee_name", employee_name);
+            params.put("email", email);
+            params.put("password", password);
+            String response=restUtil.post("http://localhost:5001/update/password",params);
+            return response.toString();
+        } catch (Exception e) {
+            LOGGER.error("details",e);
             JSONObject jsonObject=new JSONObject();
             jsonObject.put("status", "failure");
             jsonObject.put("message", JSONObject.NULL);
@@ -131,12 +164,54 @@ public class EmployeeController {
         }
     }
 
-    public static String getEmployeeDetails(){
-        return employeeDetails;
+    @GetMapping(value="/getEmployee/Employer/details")
+	public String getEmployeeEmployerDetails(HttpSession session){
+		try {
+            Map<String,Object> params =new HashMap<String,Object>();
+		    String response=restUtil.get("http://localhost:5001/employee/employer/data", params);
+            return response.toString();
+        } catch (Exception e) {
+            LOGGER.error("details",e);
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", JSONObject.NULL);
+            jsonObject.put("data", "yes");
+            return jsonObject.toString();
+        }
+
+	}
+
+    @GetMapping(value = "/employees/associated/employer")
+    public String countEmployees(HttpSession session){
+        try {
+            Map<String,Object> params =new HashMap<String,Object>();
+		    String response=restUtil.get("http://localhost:5001/count_employer_enrollments", params);
+            return response.toString();
+        } catch (Exception e) {
+            LOGGER.error("details",e);
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", JSONObject.NULL);
+            jsonObject.put("data", "yes");
+            return jsonObject.toString();
+        }
     }
 
-    @GetMapping(value = "/showDetailsPage")
-    public ModelAndView showDetailPage(){
-        return new ModelAndView("details");
+    @PostMapping(value = "/join/company")
+    public String subscribeToEmpployer(HttpSession session,Integer employee_id,Integer employer_id){
+        try {
+            Map<String,Object> params =new HashMap<String,Object>();
+            params.put("employee_id",employee_id);
+            params.put("employer_id",employer_id);
+		    String response=restUtil.post("http://localhost:5001/employee/subscribe", params);
+            return response.toString();
+        } catch (Exception e) {
+            LOGGER.error("details",e);
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", "failure");
+            jsonObject.put("message", JSONObject.NULL);
+            jsonObject.put("data", "yes");
+            return jsonObject.toString();
+        }
     }
 }

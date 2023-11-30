@@ -71,7 +71,7 @@
                     <p>Not Regestered?<a id="regesterBtn">Register Now</a></p>
                 </div>
                 <div>
-                    <a>forgot password</a>
+                    <a id="forgotPw">forgot password</a>
                 </div>
             </div>
         </div>
@@ -80,7 +80,9 @@
             let registerBtnEl=document.getElementById("regesterBtn");
             let passErrMsg=document.getElementById("pswErrorMsg");
             let userErrMsgEl=document.getElementById("userErMsg");
-            let usernameEl=document.getElementById("username")
+            let usernameEl=document.getElementById("username");
+            let forgotPwEl=document.getElementById("forgotPw");
+
             async function doLogin(url="",data={}){
                 const response=await fetch(url,
                     {
@@ -95,7 +97,6 @@
                 let userInput=document.getElementById("username").value;
                 let passwordInput=document.getElementById("password").value;
                 doLogin("/dologin",{"username":userInput,"password":passwordInput}).then((response)=>{  
-                    console.log(response);
                     if(response.status=="success"){
                         let employee_id=response.data.employee_id
                         window.location.href="/home/"+employee_id;
@@ -109,6 +110,10 @@
                         passErrMsg.textContent=response.message;
                     }
                 })
+            })
+
+            forgotPw.addEventListener("click",function(){
+                window.location.href="/reset/password"
             })
 
             registerBtnEl.addEventListener("click",function(){
