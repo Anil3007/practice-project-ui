@@ -35,6 +35,7 @@
                 padding: 11px 31px;
                 border: none;
                 border-radius: 6px;
+                cursor: pointer;
             }
             p{
                 font-size: 12px;
@@ -44,6 +45,7 @@
                 color: #2b36e2;
                 font-weight: bold;
                 text-decoration: underline;
+                cursor: pointer;
             }
             .errMsg{
                 color: red;

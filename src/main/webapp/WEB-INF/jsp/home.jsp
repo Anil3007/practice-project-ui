@@ -10,10 +10,7 @@
         padding: 0px;
         box-sizing: content-box;
       }
-      .logoutCon {
-        display: flex;
-        justify-content: end;
-      }
+
       #container {
         padding: 25px;
       }
@@ -26,8 +23,37 @@
         background-size: cover;
         min-height: 100vh;
         color: white;
-        padding: 0px 20px;
+        padding: 0px 0px;
         margin: 0px;
+      }
+      nav {
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        border-bottom: solid 2px white;
+        background-image: linear-gradient(
+          to top left,
+          #141451,
+          rgb(139, 92, 246)
+        );
+        overflow: hidden;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 6px 0px;
+      }
+
+      ul {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      li {
+        list-style-type: none;
+        margin: 0px 15px;
+      }
+      .cont-container {
+        margin: 50px 0px 0px 0px;
       }
       table {
         text-align: center;
@@ -45,45 +71,53 @@
         height: 33px;
         margin: 10px 26px;
       }
-      a{
-        text-decoration: underline;
+      a {
+        text-decoration: none;
+        color: white;
       }
     </style>
   </head>
   <body>
     <div class="bg-container">
-      <div id="container">
-        <div class="logoutCon">
-          <a id="logout">Logout</a>
+      <nav>
+        <ul>
+          <li><a href="default.asp">Home</a></li>
+          <li><a href="news.asp">Attendance</a></li>
+          <li><a id="salary">Salary</a></li>
+          <li><a id="logout">Logout</a></li>
+        </ul>
+      </nav>
+      <div class="cont-container">
+        <div id="container">
+          <p>Id:<span id="emID"></span></p>
+          <p>
+            Name:<span id="emName"></span>
+            <span>
+              <select id="joiningInCompany">
+                <option value="" hidden>Join Company</option>
+                <option value="3">Google</option>
+                <option value="1">Giottus</option>
+                <option value="4">Microsoft</option>
+                <option value="2">Zoho</option>
+                <option value="5">FaceBook</option>
+              </select>
+            </span>
+          </p>
+          <p>Email:<span id="emEmail"></span></p>
         </div>
-        <p>Id:<span id="emID"></span></p>
-        <p>
-          Name:<span id="emName"></span>
-          <span>
-            <select id="joiningInCompany">
-              <option value="" hidden>Join Company</option>
-              <option value="3">Google</option>
-              <option value="1">Giottus</option>
-              <option value="4">Microsoft</option>
-              <option value="2">Zoho</option>
-              <option value="5">FaceBook</option>
-            </select>
-          </span>
-        </p>
-        <p>Email:<span id="emEmail"></span></p>
-      </div>
-      <div>
-        <select id="companies">
-          <option value="" selected>All Companies</option>
-          <option value="Google">Google</option>
-          <option value="Giottus">Giottus</option>
-          <option value="Microsoft">Microsoft</option>
-          <option value="Zoho">Zoho</option>
-          <option value="Facebook">Facebook</option>
-        </select>
-      </div>
-      <div class="table-container">
-        <table id="table"></table>
+        <div>
+          <select id="companies">
+            <option value="" selected>All Companies</option>
+            <option value="Google">Google</option>
+            <option value="Giottus">Giottus</option>
+            <option value="Microsoft">Microsoft</option>
+            <option value="Zoho">Zoho</option>
+            <option value="Facebook">Facebook</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table id="table"></table>
+        </div>
       </div>
     </div>
     <script type="text/javascript">
@@ -146,25 +180,30 @@
           let rowEl = document.createElement("tr");
           let idEl = document.createElement("td");
           idEl.textContent = employeeData.employee_id;
-          idEl.addEventListener("click", function () {
-            getEmployeesAssociated(
-              "employees/associated/employer" + employeeData.employee_id
-            ).then((res) => {
-              console.log("hdsfj");
-            });
-          });
 
           let nameEl = document.createElement("td");
           nameEl.textContent = employeeData.employee_name;
 
           let companyEl = document.createElement("td");
           companyEl.textContent = employeeData.employer_name;
+          companyEl.setAttribute(
+            "id",
+            employeeData.employer_name + employeeData.employee_id
+          );
 
           let joinedTimeEl = document.createElement("td");
           joinedTimeEl.textContent = employeeData.joined_time;
 
           rowEl.append(idEl, nameEl, companyEl, joinedTimeEl);
           tableTagEl.appendChild(rowEl);
+
+          document
+            .getElementById(
+              employeeData.employer_name + employeeData.employee_id
+            )
+            .addEventListener("click", function (event) {
+              console.log(event.target);
+            });
         }
       }
 
@@ -219,9 +258,23 @@
           });
         });
 
-        document.getElementById("logout").addEventListener("click",function(){
-            window.location.href = "/login";
-        })
+      document.getElementById("logout").addEventListener("click", function () {
+        window.location.href = "/login";
+      });
+
+      async function getSalaryDetails(url = "", data = {}) {
+        const res = await fetch(url);
+        return res.json();
+      }
+
+      document.getElementById("salary").addEventListener("click", function () {
+        getSalaryDetails("/gt/emp/slry").then((res) => {
+          if (res.status == "success") {
+            window.location.href = "/salary/Details";
+          }
+          
+        });
+      });
     </script>
   </body>
 </html>

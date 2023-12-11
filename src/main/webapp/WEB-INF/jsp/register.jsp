@@ -51,6 +51,7 @@
                 padding: 4px 12px;
                 border: none;
                 border-radius: 2px;
+                cursor: pointer;
             }
             p{
                 font-size: 12px;
@@ -59,6 +60,7 @@
                 color: #16ad11;
                 font-weight: bold;
                 text-decoration: underline;
+                cursor: pointer;
             }
             
     </style>
